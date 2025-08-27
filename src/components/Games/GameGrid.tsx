@@ -4,63 +4,13 @@ import GameCard from './GameCard';
 const sampleGames = [
   {
     id: '1',
-    title: 'Battle Arena',
-    description: 'Fast-paced multiplayer battle royale where strategy meets action',
-    image: '/games/battle-arena.jpg',
-    players: 23,
-    maxPlayers: 50,
-    category: 'Action',
-    difficulty: 'Hard' as const,
-  },
-  {
-    id: '2',
-    title: 'Puzzle Master',
-    description: 'Challenge your mind with collaborative puzzle solving',
-    image: '/games/puzzle-master.jpg',
-    players: 8,
-    maxPlayers: 12,
-    category: 'Puzzle',
-    difficulty: 'Medium' as const,
-  },
-  {
-    id: '3',
-    title: 'Speed Racers',
-    description: 'High-octane racing with friends around the world',
-    image: '/games/speed-racers.jpg',
-    players: 15,
-    maxPlayers: 20,
-    category: 'Racing',
-    difficulty: 'Easy' as const,
-  },
-  {
-    id: '4',
-    title: 'Tower Defense Pro',
-    description: 'Defend your base in this strategic multiplayer tower defense',
-    image: '/games/tower-defense.jpg',
-    players: 6,
-    maxPlayers: 8,
-    category: 'Strategy',
-    difficulty: 'Hard' as const,
-  },
-  {
-    id: '5',
-    title: 'Word Warriors',
-    description: 'Battle with words in this competitive vocabulary game',
-    image: '/games/word-warriors.jpg',
-    players: 12,
-    maxPlayers: 16,
-    category: 'Puzzle',
-    difficulty: 'Medium' as const,
-  },
-  {
-    id: '6',
-    title: 'Space Conquest',
-    description: 'Explore and conquer the galaxy with other players',
-    image: '/games/space-conquest.jpg',
-    players: 31,
+    title: 'Juicy Train',
+    description: 'All aboard the ultimate multiplayer train adventure',
+    image: '/memes/juicy-train.png',
+    players: 42,
     maxPlayers: 100,
-    category: 'Strategy',
-    difficulty: 'Hard' as const,
+    category: 'Action',
+    difficulty: 'Medium' as const,
   },
 ];
 
@@ -80,8 +30,8 @@ export default function GameGrid({ category, featured = false }: GameGridProps) 
     <div className="space-y-6">
       {featured && (
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Featured Games</h2>
-          <p className="text-gray-600">Jump into the most popular multiplayer games right now</p>
+          <h2 className="text-2xl font-bold text-white mb-2">Featured Game</h2>
+          <p className="text-gray-300">Jump aboard the Juicy Train adventure!</p>
         </div>
       )}
       
@@ -94,8 +44,8 @@ export default function GameGrid({ category, featured = false }: GameGridProps) 
       {displayGames.length === 0 && (
         <div className="text-center py-12">
           <div className="text-gray-400 text-6xl mb-4">🎮</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No games found</h3>
-          <p className="text-gray-500">Try browsing a different category</p>
+          <h3 className="text-lg font-medium text-white mb-2">No games found</h3>
+          <p className="text-gray-400">Try browsing a different category</p>
         </div>
       )}
     </div>

@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,11 +7,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
@@ -24,3 +17,166 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+video {
+  background-color: #111;          /* or any brand color / gradient */
+}
+
+/* Darken only the open <option> list – the <select> element itself stays native */
+
+/* All rows in the list */
+select option {
+  background-color: #000;   /* black */
+  color: #fff;              /* white text */
+}
+
+/* Row that's hovered/keyboard-focused or currently chosen */
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: #111827; /* gray-800 highlight */
+  color: #fff;
+}
+
+/* Long option labels: keep them tidy */
+select option {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Custom Scrollbar Styles (Dark Theme) ───────────────────────── */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+}
+
+/* ── basic typography for the bio editor ───────────────────────── */
+.bio-editor {
+  font-size: 1rem;          /* normal paragraph */
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+/* headings */
+.bio-editor h2 {
+  margin: 1.25rem 0 0.75rem;
+  font-size: 1.25rem;       /* ~20 px */
+  font-weight: 600;
+}
+.bio-editor h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1.125rem;      /* ~18 px */
+  font-weight: 600;
+}
+
+/* emphasis */
+.bio-editor strong { font-weight: 600; }
+.bio-editor em     { font-style: italic; }
+
+/* blockquote */
+.bio-editor blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 4px solid #0ea5e9; /* sky-500 */
+  color: #d1d5db;                 /* gray-300 */
+  font-style: italic;
+}
+
+/* links */
+.bio-editor a {
+  color: #38bdf8;                 /* sky-400 */
+  text-decoration: underline;
+}
+.bio-editor a:hover {
+  color: #7dd3fc;                 /* sky-300 */
+}
+
+/* remove blue focus ring Safari/Chromium adds to editable area */
+.bio-editor:focus {
+  outline: none;
+}
+
+/* ── LISTS ──────────────────────────────────────────────────────── */
+.bio-editor ul,
+.bio-editor ol {
+  margin: 0.75rem 0 0.75rem 1.25rem;   /* indent + vertical space */
+  padding: 0;                          /* reset UA padding */
+}
+
+.bio-editor ul li,
+.bio-editor ol li {
+  margin: 0.25rem 0;                   /* a little breathing room */
+  line-height: 1.5;
+}
+
+/* bullet list marker */
+.bio-editor ul {
+  list-style: disc inside;             /* single line keeps bullets aligned */
+}
+.bio-editor ul li::marker {
+  color: #ffffff;                      /* sky-400 */
+}
+
+/* ordered list marker */
+.bio-editor ol {
+  list-style: decimal inside;
+}
+.bio-editor ol li::marker {
+  color: #ffffff;                      /* indigo-300 gives subtle contrast */
+  font-weight: 500;
+}
+
+/* nested lists: indent more but shrink marker a bit */
+.bio-editor ul ul,
+.bio-editor ol ul,
+.bio-editor ul ol,
+.bio-editor ol ol {
+  margin-left: 1.5rem;
+}
+.bio-editor ul ul li::marker,
+.bio-editor ol ul li::marker,
+.bio-editor ul ol li::marker,
+.bio-editor ol ol li::marker {
+  font-size: 0.85em;
+}
+
+/* ── (Optional) horizontal rule if you ever allow it ───────────── */
+.bio-editor hr {
+  border: none;
+  border-top: 1px solid #374151;       /* gray-700 */
+  margin: 1.5rem 0;
+}
+
+.bio-editor li > p {
+  display: inline;          /* keep paragraph text on same row as marker */
+  margin: 0;                /* kill default top/bottom margin */
+}
+

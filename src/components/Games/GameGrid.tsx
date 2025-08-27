@@ -6,7 +6,7 @@ const sampleGames = [
     id: '1',
     title: 'Juicy Train',
     description: 'All aboard the ultimate multiplayer train adventure',
-    image: '/memes/juicy-train.png',
+    image: '/games/juicy-train.png',
     players: 42,
     maxPlayers: 100,
     category: 'Action',

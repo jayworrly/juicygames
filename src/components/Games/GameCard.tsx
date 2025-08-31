@@ -1,7 +1,9 @@
+'use client';
+
 import { UsersIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface GameCardProps {
-  id: string;
   title: string;
   description: string;
   image: string;
@@ -14,6 +16,7 @@ interface GameCardProps {
 export default function GameCard({ 
   title, 
   description, 
+  image, 
   players, 
   maxPlayers, 
   category, 
@@ -22,51 +25,47 @@ export default function GameCard({
   const getDifficultyColor = (level: string) => {
     switch (level) {
       case 'Easy':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-900 text-green-300';
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-900 text-yellow-300';
       case 'Hard':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-900 text-red-300';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-700 text-gray-300';
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
+    <div className="bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
       {/* Game Image */}
-      <div className="relative h-48 bg-gradient-to-br from-indigo-500 to-purple-600">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-6xl text-white opacity-50">🎮</div>
-        </div>
-        <div className="absolute top-2 right-2">
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getDifficultyColor(difficulty)}`}>
-            {difficulty}
-          </span>
-        </div>
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 flex items-center justify-center">
-          <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-3 text-indigo-600 hover:text-indigo-700">
-            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </button>
-        </div>
+      <div className="h-48 bg-gray-900 relative">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-contain"
+        />
+      </div>
+      <div className="px-4 pt-2">
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getDifficultyColor(difficulty)}`}>
+          {difficulty}
+        </span>
       </div>
 
       {/* Game Info */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">{title}</h3>
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+          <h3 className="text-lg font-semibold text-white truncate">{title}</h3>
+          <span className="text-xs text-gray-300 bg-gray-700 px-2 py-1 rounded">
             {category}
           </span>
         </div>
         
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{description}</p>
+        <p className="text-sm text-gray-300 mb-3 line-clamp-2">{description}</p>
         
         {/* Players and Action */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center text-sm text-gray-500">
+          <div className="flex items-center text-sm text-gray-400">
             <UsersIcon className="h-4 w-4 mr-1" />
             <span>{players}/{maxPlayers} playing</span>
           </div>

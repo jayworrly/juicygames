@@ -2,8 +2,10 @@
 
 import { UsersIcon } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface GameCardProps {
+  id: string;
   title: string;
   description: string;
   image: string;
@@ -22,6 +24,9 @@ export default function GameCard({
   category, 
   difficulty 
 }: GameCardProps) {
+  // Generate game route based on title
+  const gameRoute = `/games/${title.toLowerCase().replace(/\s+/g, '-')}`;
+
   const getDifficultyColor = (level: string) => {
     switch (level) {
       case 'Easy':
@@ -70,9 +75,12 @@ export default function GameCard({
             <span>{players}/{maxPlayers} playing</span>
           </div>
           
-          <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors duration-200">
+          <Link 
+            href={gameRoute}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors duration-200 inline-block text-center"
+          >
             Play Now
-          </button>
+          </Link>
         </div>
       </div>
     </div>

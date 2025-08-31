@@ -3,14 +3,13 @@
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
-import { SidebarProvider, useSidebar } from '../../contexts/SidebarContext';
+import { SidebarProvider } from '../../contexts/SidebarContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 function LayoutContent({ children }: MainLayoutProps) {
-  const { isSidebarOpen } = useSidebar();
 
   return (
     <div className="flex h-screen bg-gray-900">

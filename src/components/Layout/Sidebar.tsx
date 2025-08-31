@@ -27,7 +27,7 @@ const navigation = [
 
 export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isSidebarOpen, toggleSidebar, closeSidebar } = useSidebar();
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
 
   return (
     <>

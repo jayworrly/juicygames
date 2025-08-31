@@ -28,15 +28,15 @@ export default function Home() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-gray-800 p-6 rounded-lg shadow text-center">
-            <div className="text-3xl font-bold text-indigo-600 mb-2">24,567</div>
+            <div className="text-3xl font-bold text-indigo-600 mb-2">0</div>
             <div className="text-gray-300">Active Players</div>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg shadow text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">156</div>
+            <div className="text-3xl font-bold text-green-600 mb-2">1</div>
             <div className="text-gray-300">Games Available</div>
           </div>
           <div className="bg-gray-800 p-6 rounded-lg shadow text-center">
-            <div className="text-3xl font-bold text-purple-600 mb-2">3,421</div>
+            <div className="text-3xl font-bold text-purple-600 mb-2">0</div>
             <div className="text-gray-300">Games Played Today</div>
           </div>
         </div>

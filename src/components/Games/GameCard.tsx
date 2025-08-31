@@ -39,22 +39,17 @@ export default function GameCard({
   return (
     <div className="bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden group">
       {/* Game Image */}
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700">
+      <div className="h-48 bg-gray-900">
         <img
           src={image}
           alt={title}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
-        <div className="absolute top-2 right-2 z-10">
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getDifficultyColor(difficulty)}`}>
-            {difficulty}
-          </span>
-        </div>
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 flex items-center justify-center">
-          <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-3 text-indigo-600 hover:text-indigo-700 z-20">
-            <PlayIcon className="h-6 w-6" />
-          </button>
-        </div>
+      </div>
+      <div className="px-4 pt-2">
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getDifficultyColor(difficulty)}`}>
+          {difficulty}
+        </span>
       </div>
 
       {/* Game Info */}

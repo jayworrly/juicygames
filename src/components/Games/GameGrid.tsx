@@ -7,7 +7,7 @@ const sampleGames = [
     title: 'Juicy Train',
     description: 'All aboard the ultimate multiplayer train adventure',
     image: '/juicy-train.png',
-    players: 42,
+    players: 0,
     maxPlayers: 100,
     category: 'Action',
     difficulty: 'Medium' as const,

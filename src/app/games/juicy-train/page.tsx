@@ -34,7 +34,7 @@ interface LeaderboardEntry {
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
-const GRID_SIZE = 20;
+const GRID_SIZE = 15; // Match server grid size for smoother movement
 
 export default function JuicyTrainGame() {
   const [connected, setConnected] = useState(false);
@@ -44,7 +44,9 @@ export default function JuicyTrainGame() {
   const [food, setFood] = useState<Food[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
-  const [gameArea, setGameArea] = useState({ width: 800, height: 600 });
+  const [gameArea, setGameArea] = useState({ width: 800, height: 600 }); // Viewport size
+  const [mapSize, setMapSize] = useState({ width: 2400, height: 1800 }); // Full map size
+  const [cameraOffset, setCameraOffset] = useState({ x: 0, y: 0 });
   const [playerCount, setPlayerCount] = useState(0);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -66,15 +68,25 @@ export default function JuicyTrainGame() {
       setGameArea(gameArea);
     });
 
-    socket.on('gameState', ({ players, food, leaderboard }) => {
+    socket.on('gameState', ({ players, food, leaderboard, currentPlayer: current, mapSize: serverMapSize }) => {
       setPlayers(players);
       setFood(food);
       setLeaderboard(leaderboard);
       setPlayerCount(players.length);
-      
-      // Find current player
-      const current = players.find((p: Player) => p.id === socket.id);
       setCurrentPlayer(current || null);
+      
+      if (serverMapSize) {
+        setMapSize(serverMapSize);
+      }
+      
+      // Calculate camera offset to center on player
+      if (current && current.alive && current.snake.length > 0) {
+        const head = current.snake[0];
+        setCameraOffset({
+          x: head.x - gameArea.width / 2,
+          y: head.y - gameArea.height / 2
+        });
+      }
     });
 
     socket.on('playerJoined', (player) => {
@@ -98,9 +110,9 @@ export default function JuicyTrainGame() {
     };
   }, []);
 
-  // Game controls
+  // Game controls with boost
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (!gameJoined || !socketRef.current) return;
       
       let direction: Direction | null = null;
@@ -126,6 +138,11 @@ export default function JuicyTrainGame() {
         case 'D':
           direction = 'right';
           break;
+        case ' ': // Spacebar for boost
+        case 'Shift':
+          event.preventDefault();
+          socketRef.current.emit('boost', true);
+          return;
       }
       
       if (direction) {
@@ -133,12 +150,25 @@ export default function JuicyTrainGame() {
         socketRef.current.emit('changeDirection', direction);
       }
     };
+    
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (!gameJoined || !socketRef.current) return;
+      
+      if (event.key === ' ' || event.key === 'Shift') {
+        event.preventDefault();
+        socketRef.current.emit('boost', false);
+      }
+    };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, [gameJoined]);
 
-  // Canvas rendering
+  // Canvas rendering with viewport
   useEffect(() => {
     if (!gameJoined || !canvasRef.current) return;
 
@@ -147,36 +177,78 @@ export default function JuicyTrainGame() {
     if (!ctx) return;
 
     // Clear canvas
-    ctx.fillStyle = '#1a1a2e';
+    ctx.fillStyle = '#0f0f23';
     ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 
-    // Draw grid (subtle)
-    ctx.strokeStyle = '#16213e';
-    ctx.lineWidth = 1;
-    for (let x = 0; x <= gameArea.width; x += GRID_SIZE) {
+    // Save context state
+    ctx.save();
+
+    // Translate for camera offset
+    ctx.translate(-cameraOffset.x, -cameraOffset.y);
+
+    // Draw grid (subtle) - only draw visible portion
+    ctx.strokeStyle = '#1a1a3e';
+    ctx.lineWidth = 0.5;
+    const startX = Math.floor(cameraOffset.x / GRID_SIZE) * GRID_SIZE;
+    const endX = startX + gameArea.width + GRID_SIZE;
+    const startY = Math.floor(cameraOffset.y / GRID_SIZE) * GRID_SIZE;
+    const endY = startY + gameArea.height + GRID_SIZE;
+    
+    for (let x = startX; x <= endX; x += GRID_SIZE) {
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, gameArea.height);
+      ctx.moveTo(x, startY);
+      ctx.lineTo(x, endY);
       ctx.stroke();
     }
-    for (let y = 0; y <= gameArea.height; y += GRID_SIZE) {
+    for (let y = startY; y <= endY; y += GRID_SIZE) {
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(gameArea.width, y);
+      ctx.moveTo(startX, y);
+      ctx.lineTo(endX, y);
       ctx.stroke();
     }
 
-    // Draw food
+    // Draw map boundaries
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(0, 0, mapSize.width, mapSize.height);
+
+    // Draw food with different sizes
     food.forEach(f => {
-      const intensity = f.value > 2 ? '#ffeb3b' : f.value > 1 ? '#ff9800' : '#4caf50';
-      ctx.fillStyle = intensity;
-      ctx.fillRect(f.position.x + 2, f.position.y + 2, GRID_SIZE - 4, GRID_SIZE - 4);
+      let color, size;
       
-      // Add glow effect
-      ctx.shadowColor = intensity;
-      ctx.shadowBlur = 8;
-      ctx.fillRect(f.position.x + 4, f.position.y + 4, GRID_SIZE - 8, GRID_SIZE - 8);
-      ctx.shadowBlur = 0;
+      switch(f.size || 'small') {
+        case 'large':
+          color = '#ff6b6b';
+          size = GRID_SIZE * 0.8;
+          break;
+        case 'medium':
+          color = '#ffd93d';
+          size = GRID_SIZE * 0.6;
+          break;
+        default: // small
+          color = '#6bcf7f';
+          size = GRID_SIZE * 0.4;
+      }
+      
+      // Draw food as circles for better visuals
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(
+        f.position.x + GRID_SIZE / 2,
+        f.position.y + GRID_SIZE / 2,
+        size / 2,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+      
+      // Add subtle glow for larger food
+      if (f.value > 1) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = f.value * 3;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
     });
 
     // Draw players
@@ -240,7 +312,45 @@ export default function JuicyTrainGame() {
         ctx.fillText(player.score.toString(), head.x + GRID_SIZE / 2, head.y - 18);
       }
     });
-  }, [players, food, gameArea, gameJoined]);
+    
+    // Restore context
+    ctx.restore();
+    
+    // Draw minimap (fixed position on canvas)
+    const minimapSize = 150;
+    const minimapX = gameArea.width - minimapSize - 10;
+    const minimapY = 10;
+    const minimapScale = minimapSize / Math.max(mapSize.width, mapSize.height);
+    
+    // Minimap background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillRect(minimapX, minimapY, minimapSize, minimapSize);
+    ctx.strokeStyle = '#666';
+    ctx.strokeRect(minimapX, minimapY, minimapSize, minimapSize);
+    
+    // Draw players on minimap
+    players.forEach(player => {
+      if (!player.alive || player.snake.length === 0) return;
+      const head = player.snake[0];
+      const minimapPlayerX = minimapX + (head.x * minimapScale);
+      const minimapPlayerY = minimapY + (head.y * minimapScale);
+      
+      ctx.fillStyle = player.id === currentPlayer?.id ? '#fff' : player.color;
+      ctx.fillRect(minimapPlayerX - 1, minimapPlayerY - 1, 3, 3);
+    });
+    
+    // Draw viewport indicator on minimap
+    if (currentPlayer) {
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(
+        minimapX + (cameraOffset.x * minimapScale),
+        minimapY + (cameraOffset.y * minimapScale),
+        gameArea.width * minimapScale,
+        gameArea.height * minimapScale
+      );
+    }
+  }, [players, food, gameArea, gameJoined, cameraOffset, mapSize, currentPlayer]);
 
   const joinGame = () => {
     if (!socketRef.current || !playerName.trim()) return;
@@ -291,7 +401,7 @@ export default function JuicyTrainGame() {
             <div className="text-center max-w-md mx-auto">
               <div className="text-8xl mb-6">🚂</div>
               <h2 className="text-3xl font-bold text-white mb-4">Join the Battle!</h2>
-              <p className="text-gray-300 mb-6">Enter your name and start growing your train!</p>
+              <p className="text-gray-300 mb-6">Enter your name and grow your train!</p>
               
               <div className="space-y-4">
                 <input
@@ -316,10 +426,11 @@ export default function JuicyTrainGame() {
                 <h3 className="text-white font-semibold mb-2">How to Play:</h3>
                 <ul className="text-gray-300 text-sm space-y-1 text-left">
                   <li>• Use WASD or arrow keys to move your train</li>
-                  <li>• Eat colorful food to grow and gain points</li>
-                  <li>• Avoid hitting other trains or you'll derail</li>
-                  <li>• Hit another train's cars to absorb their cargo!</li>
-                  <li>• Become the longest train to dominate!</li>
+                  <li>• Collect cargo to grow your train longer</li>
+                  <li>• Hold Space or Shift to boost (drops cargo!)</li>
+                  <li>• Avoid crashing into other trains</li>
+                  <li>• Make others crash to collect their cargo!</li>
+                  <li>• Become the longest train on the rails!</li>
                 </ul>
               </div>
             </div>
@@ -396,7 +507,7 @@ export default function JuicyTrainGame() {
             
             {/* Controls Info */}
             <div className="mt-4 text-sm text-gray-400 text-center">
-              Use WASD or Arrow Keys to move • Eat food to grow • Avoid other trains!
+              WASD/Arrows to steer • Space/Shift to boost • Collect cargo • Avoid crashes!
             </div>
           </div>
 

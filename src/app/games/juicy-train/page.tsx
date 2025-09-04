@@ -25,6 +25,7 @@ interface Food {
   id: string;
   position: Position;
   value: number;
+  size?: 'small' | 'medium' | 'large';
 }
 
 interface LeaderboardEntry {

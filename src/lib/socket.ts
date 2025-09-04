@@ -37,7 +37,7 @@ const INITIAL_SNAKE_LENGTH = 3;
 const FOOD_COUNT = 50;
 
 let io: IOServer;
-let gameState: GameState = {
+const gameState: GameState = {
   players: new Map(),
   food: [],
   gameArea: GAME_AREA
